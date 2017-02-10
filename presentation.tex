@@ -1,0 +1,924 @@
+\RequirePackage[l2tabu, orthodox]{nag}
+\RequirePackage{silence}
+\WarningFilter{nag}{There is no environment ``centering'' }%nag complains because beamer titlepage uses a centering environment
+\WarningFilter{nag}{1 complaints in total}
+\WarningFilter{ifpdf}{Someone has redefined \pdfoutput}
+\WarningFilter{fmtcount}{\ordinal already defined use \FCordinal instead}
+\documentclass[french,english]{beamer}
+\input{preamble/packages}
+\input{preamble/math_basics}
+\input{preamble/math_mine}
+\input{preamble/redac}
+\input{preamble/draw}
+\input{preamble/acronyms}
+
+\title{Arguing about voting rules}
+\subject{Social Choice}
+\keywords{axioms, Borda, Condorcet, explanation, argumentation}
+\author{Olivier Cailloux}
+\institute[LAMSADE]{LAMSADE, Université Paris-Dauphine \\ Joint work with Ulle Endriss, University of Amsterdam}
+\date{\formatdate{16}{2}{2017}}
+\begin{document}
+\begin{frame}[plain]
+	\tikz[remember picture,overlay]{
+		\path (current page.south west) node[anchor=south west, inner sep=0] {
+			\includegraphics[height=1cm]{LAMSADE95.jpg}
+		};
+		\path (current page.south) ++ (0, 1mm) node[anchor=south, inner sep=0] {
+			\includegraphics[height=9mm]{Dauphine.jpg}
+		};
+		\path (current page.south east) node[anchor=south east, inner sep=0] {
+			\includegraphics[height=1cm]{PSL.png}
+		};
+	}
+	\titlepage
+\end{frame}
+\addtocounter{framenumber}{-1}
+
+\begin{frame}
+	\frametitle{Outline}
+	\tableofcontents[hideallsubsections, sectionstyle=shaded/show]
+\end{frame}
+
+\AtBeginSection{
+	\begin{frame}
+		\frametitle{Outline}
+		\tableofcontents[currentsection, hideallsubsections]
+	\end{frame}
+}
+
+\section{Introduction to Social Choice}
+\subsection{Definition}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{definition}[Social Choice]
+		Designing and analyzing methods for collective decision making
+	\end{definition}
+	\begin{itemize}
+		\item Focus on: mathematical analysis {\tiny preferably non empirical}
+		\item (Usually) no focus on: collective social behavior
+	\end{itemize}
+\end{frame}
+
+\subsection{The Condorcet paradox}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{itemize}
+		\item Why should we analyze decision schemes mathematically?
+		\item Here is a preliminary argument
+		\item 3 alternatives : $a, b, c$
+		\item 3 voters : $1, 2, 3$
+		\item Compare alternatives pairwise
+		\item $a$ VS $b$: 2 votes for $a$
+		\item $b$ VS $c$: 2 votes for $b$
+		\item Conclusion? \pause $a \succ c$? Not so simple!
+	\end{itemize}
+	\begin{equation}
+		\begin{array}{rrr}
+			a	&b	&c\\
+			b	&c	&a\\
+			c	&a	&b\\
+		\end{array}
+	\end{equation}
+\end{frame}
+
+\subsection{Two key moments}
+\begin{frame}
+	\frametitle{\subsecname: 1. Borda, Condorcet}
+	\begin{itemize}
+		\item Nicolas de Condorcet [1743 – 1794]
+		\item Jean-Charles de Borda [1733 – 1799]
+		\item Start of \emph{mathematical, systematic} analysis of voting schemes
+		\item Rich period of constitution writing
+		\item Condorcet initially involved in the writing of the French constitution
+		\item Borda’s rank-order method was first proposed orally at the French Academy of Science in 1770 \citep{suzumura_introduction_2002}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\subsecname: 2. Arrow}
+	\begin{itemize}
+		\item up to Arrow: mostly analysis of individual voting schemes
+		\item Kenneth Arrow [1921 – ]
+		\item Analysis of \emph{classes} of voting schemes
+		\item According to properties
+		\item[⇒] {\tiny (for example)} Nobel price in 1998 to Amartya Sen (welfare economics)
+	\end{itemize}
+\end{frame}
+
+\subsection{This talk VS reality}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{itemize}
+		\item Elections happen IRL (? \pause in real life) \pause
+		\item Quite far from the setting examined here
+		\item Preferences expressed in various ways
+		\item Procedures may not fit this framework
+		\item Social Choice in general relevant to this part of reality
+		\item In this talk: \emph{limited} connexion
+	\end{itemize}
+\end{frame}
+
+\section{Voting rules}
+\subsection{Definition}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{itemize}
+		\item Voting rule: a systematic way of aggregating different opinions and decide
+		\item Multiple reasonable ways of doing this
+		\item Different voting rules have different interesting properties
+		\item None satisfy all desirable properties
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Voting rule}
+	
+	\begin{description}[Alternatives]
+		\item[Alternatives] $\allalts = \set{a, b, c, d, \ldots}$
+		\item[Voters] $\allvoters = \set{1, 2, \ldots}$
+		\item[Profile] function $\prof$ from $\allvoters$ to linear orders on $\allalts$.
+		\item[Voting rule] function $f$ mapping each $\prof$ to winners $\emptyset \subset \alts \subseteq \allalts$.
+	\end{description}
+	\vfill
+	\begin{center}
+		\begin{tikzpicture}
+			\path node[profile matrix] (profile) {
+				\prof(1)&
+				\prof(2)
+				\\
+				| (profile11) | a&
+				b
+				\\
+				b&
+				a
+				\\
+				c&
+				| (profile32) | c
+				\\
+			};
+			\path ($(profile.south west)!.5!(profile.south east)$) ++ (0, -5mm) node {$\prof$};
+			
+			\path node[draw, rectangle, fit=(profile11) (profile32), outer xsep=2mm, outer ysep=1mm] (justprofile) {};
+			\path (justprofile.east) ++ (2.5cm, 0) node[inner sep=0] (winners) {\mbox{} $\alts = \Set{a, b}$};
+			\path[draw, ->] (justprofile.east) to[bend left=35] node[anchor=south] {$f$} (winners.west);
+
+			\path[draw, decorate, decoration={brace, mirror}] (justprofile.south west) -- (justprofile.south east);
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\subsection{Example of a profile}
+\begin{frame}[fragile]
+	\frametitle{\subsecname}
+	\begin{equation}
+		\begin{array}{lrrrrrr}
+			&\multicolumn{6}{c}{\text{nb voters}}\\
+		\cmidrule{2-7}
+				&33	&16	&3	&8	&18	&22	\\
+		\midrule
+			1	&a	&b	&c	&c	&d	&e	\\
+			2	&b	&d	&d	&e	&e	&c	\\
+			3	&c	&c	&b	&b	&c	&b	\\
+			4	&d	&e	&a	&d	&b	&d	\\
+			5	&e	&a	&e	&a	&a	&a	\\
+		\end{array}
+	\end{equation}
+	Who wins?\pause
+	\tikz[remember picture,overlay]{
+		\path (current page.south east) ++ (0, 1em) node[anchor=south east, inner sep=0] {
+			\tiny Thanks to \href{http://www.lamsade.dauphine.fr/~lang/}{Jérôme Lang}
+		};
+	}
+	\begin{itemize}
+		\item Most top-1: $a$
+		\item $c$ is in the top 3 for everybody
+		\item delete worst first, lowest nb of pref: $c$, $b$, $e$, $a$ ⇒ $d$
+		\item delete worst first, from bottom: $a$, $e$, $d$, $b$ ⇒ $c$
+		\item Borda: $b$
+%		\item Condorcet: $c$
+	\end{itemize}
+\end{frame}
+
+\subsection{Two voting rules}
+\begin{frame}
+	\frametitle{Borda}
+	
+Given a profile $\prof$:
+	\begin{itemize}
+		\item score of $a \in \allalts$: number of alternatives it beats
+		\item the highest scores win
+	\end{itemize}
+	
+	\begin{equation}
+		\prof =
+		\begin{array}{rrrrr}
+			a	&	a	&	a	&	b	&	b\\
+			b	&	b	&	b	&	c	&	c\\
+			c	&	c	&	c	&	a	&	a
+		\end{array}
+	\end{equation}
+	\begin{itemize}
+		\item score $a$ is\dots? \pause $2 + 2 + 2 = 6$
+		\item score $b$ is $1 + 1 + 1 + 2 + 2 = 7$
+		\item score $c$ is $1 + 1 = 2$
+	\end{itemize}
+	Winner: $b$.
+\end{frame}
+
+\begin{frame}
+	\frametitle{Condorcet’s principle}
+	\begin{block}{Condorcet’s principle}
+		We ought to take the Condorcet winner as sole winner if it exists.
+		\begin{itemize}
+			\item $a$ \emph{beats} $b$ iff more than half the voters prefer $a$ to $b$.
+			\item $a$ is a \emph{Condorcet winner} iff $a$ beats every other alternatives.
+		\end{itemize}
+	\end{block}
+	\vfill
+	\begin{equation}
+		\prof =
+		\begin{array}{rrrrr}
+			a	&	a	&	a	&	b	&	b\\
+			b	&	b	&	b	&	c	&	c\\
+			c	&	c	&	c	&	a	&	a
+		\end{array}
+	\end{equation}
+	 Who wins? \pause $a$
+\end{frame}
+
+\begin{frame}
+	\frametitle{Condorcet’s principle and a voting rule}
+	\begin{itemize}
+		\item Condorcet’s principle does not define a voting rule. Why? \pause
+		\item No winner is defined when no Condorcet winner
+	\end{itemize}
+	\begin{equation}
+		\prof =
+		\begin{array}{rrr}
+			b	&	c	&	d\\
+			c	&	d	&	b\\
+			a	&	b	&	a\\
+			d	&	a	&	c
+		\end{array}
+	\end{equation}
+	\pause
+	$a$ loses against $b$; $b$ against $d$; $c$ against $b$; $d$ against $c$
+	\begin{itemize}
+		\item Dodgson’s method (1876): candidates “closest” to being Condorcet winners {\tiny (in nb of swaps)}
+	\end{itemize}
+\end{frame}
+
+\section{Analyzing voting rules}
+\subsection[Problem]{Problems do arise}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{itemize}
+		\item Example of a problem: Borda does not satisfy Condorcet’s principle
+		\item Even when knowing the precise rule, we may overlook some problems of it
+		\item We would like some way of finding out systematically whether a rule is “well-behaved”
+	\end{itemize}
+\end{frame}
+
+\subsection{Axiomatics}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{quote}
+		Rather than dream up a multitude of arbitration schemes and determine whether or not each withstands the best of plausibility in a host of special cases, let us invert the procedure. Let us examine our subjective intuition of fairness and formulate this as a set of precise desiderata that any acceptable arbitration scheme must fulfil. Once these desiderata are formalized as axioms, then the problem is reduced to a mathematical investigation of the existence of and characterization of arbitration schemes which satisfy the axioms.
+	\end{quote}
+	\citet[p. 121]{luce_games_1957}\par
+	Some example of axioms? \pause Condorcet’s principle!
+\end{frame}
+
+\begin{frame}
+	\frametitle{What’s an axiom?}
+	\begin{itemize}
+		\item An axiom (for us) is a principle
+		\item Expressed formally
+		\item That dictates some behavior of a voting rule
+		\item In some conditions
+		\item Usually seen as something to be satisfied
+		\item Ideally, some union of some such axioms define exactly one rule
+		\item Some axioms can be shown to be incompatible
+	\end{itemize}
+	\begin{example}[Condorcet’s principle]
+		We ought to take the Condorcet winner as sole winner if it exists.
+	\end{example}
+\end{frame}
+
+\subsection{Unanimity}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{definition}[Unanimity]
+		We ought to select as winner someone who has no unanimously preferred alternative
+	\end{definition}
+	\begin{equation}
+		\prof =
+		\begin{array}{rrr}
+			a	&	a	&	b\\
+			b	&	b	&	c\\
+			c	&	c	&	a
+		\end{array}
+	\end{equation}
+	Constraint? \pause Do not take $c$ as $b$ is unanimously preferred to it.	\pause
+	\begin{equation}
+		\prof =
+		\begin{array}{rrr}
+			a	&	a	&	b\\
+			b	&	c	&	c\\
+			c	&	b	&	a
+		\end{array}
+	\end{equation}
+	Constraint? \pause No constraint.
+\end{frame}
+
+\subsection[IIF]{Independence of Infeasible Alternatives}
+\begin{frame}[fragile]
+	\frametitle{Social choice correspondence}
+%	\begin{description}[Social choice correspondence]
+%		\item[Alternatives] $\allalts = \set{a, b, c, d, \ldots}$
+%		\item[Feasible alternatives] $\emptyset \subset F \subseteq \allalts$
+%		\item[Voters] $\allvoters = \set{1, 2, \ldots}$
+%		\item[Profile] function $\prof$ from $\allvoters$ to orders on $\allalts$
+%		\item[Social choice correspondence] function $f$ mapping each $\prof$ \emph{and} $\feasalts$ to winners $\emptyset \subset \alts \subseteq \feasalts$.
+%	\end{description}
+	\begin{itemize}
+		\item Some alternatives might be infeasible
+		\item Preferences over $\allalts$, choose among $\feasalts$
+		\item $f$ a function that, given a profile and a set of feasible alternatives, chooses a subset of winners
+		\item $f(\prof, \feasalts) \subseteq \feasalts$
+	\end{itemize}
+	\vfill
+	\begin{center}
+		\begin{tikzpicture}
+			\path node (feas) {$\feasalts = \{a, c\}$};
+			\path (feas.south) node[anchor=north, profile matrix] (profile) {
+				\prof(1)&
+				\prof(2)
+				\\
+				| (profile11) | a&
+				b
+				\\
+				b&
+				a
+				\\
+				c&
+				| (profile32) | c
+				\\
+			};
+			\path ($(profile.south west)!.5!(profile.south east)$) ++ (0, -5mm) node {$\prof$};
+			
+			\path node[draw, rectangle, fit=(profile11) (profile32), outer xsep=2mm, outer ysep=1mm] (justprofile) {};
+			\path (justprofile.east) ++ (2.5cm, 0) node[inner sep=0] (winners) {\mbox{} $\alts = \set{a}$};
+			\path[draw, ->] (justprofile.east) to[bend left=45] node[anchor=south] {$f$} (winners.west);
+			\path[draw, ->] (feas.east) to[bend left=20] (winners.west);
+
+			\path[draw, decorate, decoration={brace, mirror}] (justprofile.south west) -- (justprofile.south east);
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{\subsecname}
+	\begin{definition}[\subsecname]
+		When preferences change only about unfeasible alternatives, we ought not to change our decision
+	\end{definition}
+	\vspace{-1.8pt}
+	\begin{example}
+		\begin{equation}
+			\begin{array}{l@{\hskip 0in}ll}
+				\prof =
+				&\begin{array}{rrr}
+					b	&	c	&	d\\
+					c	&	d	&	b\\
+					a	&	b	&	a\\
+					d	&	a	&	c
+				\end{array},
+				& f(\prof, \{b, c, d\}) = \set{b},\\[3em]
+				\prof' =
+				&\begin{array}{rrr}
+					b	&	a	&	d\\
+					c	&	c	&	a\\
+					d	&	d	&	b\\
+					a	&	b	&	c
+				\end{array},
+				& f(\prof', \{b, c, d\})\text{ ?}
+				\pause
+				\set{b}
+			\end{array}
+		\end{equation}
+	\end{example}
+\end{frame}
+
+\subsection[ACA]{Arrow’s choice axiom}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{definition}[\subsecname]
+		When feasible alternatives are restricted, with no change of preference, we ought not to change our decision if possible
+	\end{definition}
+	\vspace{-1.8pt}
+	\begin{example}
+		\begin{equation}
+			\prof =
+			\begin{array}{rrr}
+				b	&	c	&	d\\
+				c	&	d	&	b\\
+				a	&	b	&	a\\
+				d	&	a	&	c
+			\end{array},
+			f(\prof, \{b, c, d\}) = \set{b, d},
+			f(\prof, \{b, c\})\text{ ?}
+			\pause
+			\set{b}
+		\end{equation}
+	\end{example}
+\end{frame}
+
+\subsection[Arrow]{Arrow’s impossibility theorem}
+\begin{frame}
+	\frametitle{Dictatorial social choice correspondences}
+	\begin{definition}[Dictatorial social choice correspondence]
+		$f$ is \emph{dictatorial} for a given voter iff $f$ always selects her preferred alternative among the feasible ones
+	\end{definition}
+	\vspace{-1.8pt}
+	\begin{example}
+		\begin{equation}
+			\begin{array}{l@{\hskip 0in}ll}
+				\prof =
+				&\begin{array}{rrr}
+					b	&	c	&	d\\
+					c	&	d	&	b\\
+					a	&	b	&	a\\
+					d	&	a	&	c
+				\end{array},
+				& f(\prof, \{b, c, d\}) = \set{c},\\[3em]
+				\prof' =
+				&\begin{array}{rrr}
+					b	&	a	&	d\\
+					c	&	b	&	a\\
+					d	&	d	&	b\\
+					a	&	c	&	c
+				\end{array},
+				& f(\prof', \{b, c, d\})\text{ ?}
+				\pause
+				\set{b}
+			\end{array}
+		\end{equation}
+	\end{example}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{theorem}[\subsecname]
+		When there are at least three alternatives, there is no social choice correspondence that satisfies Unanimity, Independence of Infeasible alternatives, Arrow’s Choice Axiom, and that is not dictatorial.
+	\end{theorem}
+\end{frame}
+
+\section{Analyzing the Borda rule}
+\subsection{Elementary profile}
+\begin{frame}[fragile]
+	\frametitle{\subsecname}
+	
+	Fix an arbitrary linear order $k$ on $\allalts$. Given $A \subseteq \allalts$, define $\pelem{A}$.
+	\begin{minipage}{5.7cm}
+		\begin{definition}[Elementary profile]
+			\begin{tikzpicture}
+				\path node[profile matrix, row 2/.style={nodes={draw, rectangle, minimum width=1.5em, minimum height=9ex}}, row 3/.style={nodes={draw, rectangle, minimum width=1.5em, minimum height=6ex}}] (profile) {
+					\pelem{A}(1)	&\pelem{A}(2)\\
+					| (profile-1-1) | 	& | (profile-1-2) | 	\\
+					| (profile-2-1) | 	& | (profile-2-2) | 	\\
+				};
+				\path (profile-1-1.west) ++(-5mm, 0) node[anchor=east] (profile-1-1 expl) {$\restr{k}{A}$};
+				\path (profile-1-2.east) ++(5mm, 0) node[anchor=west] (profile-1-2 expl) {$\restr{k^{-1}}{A}$};
+				\path (profile-2-1.west) ++(-5mm, 0) node[anchor=east] (profile-2-1 expl) {$\restr{k}{\allalts \setminus A}$};
+				\path (profile-2-2.east) ++(5mm, 0) node[anchor=west] (profile-2-2 expl) {$\restr{k^{-1}}{\allalts \setminus A}$};
+				\path[draw, ->] (profile-1-1 expl.east) -- (profile-1-1.west);
+				\path[draw, <-] (profile-1-2.east) -- (profile-1-2 expl.west);
+				\path[draw, ->] (profile-2-1 expl.east) -- (profile-2-1.west);
+				\path[draw, <-] (profile-2-2.east) -- (profile-2-2 expl.west);
+				
+				\path[draw, decorate, decoration={brace, mirror}] (profile.south west) -- (profile.south east);
+				\path (profile.south) ++(0, -5mm) node {$\pelem{A}$};
+			\end{tikzpicture}
+		\end{definition}
+	\end{minipage}\hspace{2em}%
+	\begin{minipage}{\columnwidth - 5.7cm - 2em}
+		\begin{example}
+			\begin{tikzpicture}
+				\path node[profile matrix] (profile) {
+					\pelem{\Set{a, b, c}}(1)	&\pelem{\Set{a, b, c}}(2)\\
+					| (profile-1-1) | a	& | (profile-1-2) | c	\\
+					b	&b	\\
+					| (profile-3-1) | c	& | (profile-3-2) | a	\\[2ex]
+					| (profile-4-1) | d	& | (profile-4-2) | e	\\
+					| (profile-5-1) | e	& | (profile-5-2) | d	\\
+				};
+				\path node[draw, rectangle, fit=(profile-1-1) (profile-3-1)] {};
+				\path node[draw, rectangle, fit=(profile-4-1) (profile-5-1)] {};
+				\path node[draw, rectangle, fit=(profile-1-2) (profile-3-2)] {};
+				\path node[draw, rectangle, fit=(profile-4-2) (profile-5-2)] {};
+				
+				\path (profile.south west) ++ (1mm, -1mm) coordinate (profile-bottom-left);
+				\path (profile.south east) ++ (-1mm, -1mm) coordinate (profile-bottom-right);
+				\path[draw, decorate, decoration={brace, mirror}] (profile-bottom-left) -- (profile-bottom-right);
+				\path (profile.south) ++(0, -5mm) node {$\pelem{\Set{a, b, c}}$};
+			\end{tikzpicture}
+		\end{example}
+	\end{minipage}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Elementary profile: axiom}
+	\begin{definition}[Axiom about elementary profiles]
+		$f(\pelem{A}) = A$
+	\end{definition}
+\end{frame}
+
+\subsection{Cyclic profile}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{definition}[Axiom about cyclic profiles]
+		When given a cyclic profile, we ought to select all winners as ex-æquo
+	\end{definition}
+	\begin{example}
+		\begin{equation}
+			f\left(
+			\begin{array}{cccc}
+				a&b&c&d\\
+				b&c&d&a\\
+				c&d&a&b\\
+				d&a&b&c\\
+			\end{array}\right) = \allalts
+		\end{equation}
+	\end{example}
+\end{frame}
+
+\subsection{Cancellation}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{definition}[Cancellation]
+		When all pairs of alternatives $(a, b)$ in a profile are such that $a$ is preferred to $b$ as many times as $b$ to $a$, we ought to select all winners as ex-æquo
+	\end{definition}
+	\begin{example}
+		\begin{equation}
+			f\left(%
+			\begin{array}{rrrr}
+				a&b&c&c\\
+				b&a&a&b\\
+				c&c&b&a\\
+			\end{array}\right) = \allalts
+		\end{equation}
+	\end{example}
+\end{frame}
+
+\subsection{Reinforcement}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{definition}[\subsecname]
+		When joining two sets of voters, exactly those winners that each set accepts should be selected, if possible
+	\end{definition}
+	\begin{example}
+		\begin{equation}
+			\prof_1 =
+			\begin{array}{cc}
+				a&b\\
+				b&a\\
+				c&c\\
+			\end{array},
+			A_1 = \set{a, b},
+			\prof_2 =
+			\begin{array}{ccc}
+				a&b&a\\
+				b&a&c\\
+				c&c&b\\
+			\end{array},
+			A_2 = \set{a},
+		\end{equation}
+		\begin{equation}
+			\prof =
+			\begin{array}{ccccc}
+				a&b&a&b&a\\
+				b&a&b&a&c\\
+				c&c&c&c&b\\
+			\end{array}.
+			\text{ Winners? }
+			\pause
+			\set{a}
+		\end{equation}
+	\end{example}
+\end{frame}
+
+\subsection{Characterisation of Borda}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{theorem}
+		The Borda rule is the only voting rule that satisfies Elementary and Cyclic profile axioms, Cancellation and Reinforcement.
+	\end{theorem}
+	(We proved this variant of a characterisation given by \citet{young_axiomatization_1974})
+\end{frame}
+
+\subsection[Against Condorcet]{Fishburn-against-Condorcet argument}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{minipage}{5.4cm}
+		\citet[p. 544]{fishburn_paradoxes_1974} argument against the Condorcet principle (see also \url{http://rangevoting.org/FishburnAntiC.html}).
+		\begin{block}{Condorcet winner}
+			$w \text{ VS } \mu, \mu \in \set{a, \ldots, h}\text{? }\uncover<2->{51/101}$
+		\end{block}
+	\end{minipage}\hfill%
+	\mbox{%
+		\small%
+		$%
+			\begin{array}{lrrrrrr}
+				&\multicolumn{6}{c}{\text{nb voters}}\\
+			\cmidrule{2-7}
+					&31	&19	&10	&10	&10	&21	\\
+			\midrule
+				1	&a	&a	&f	&g	&h	&h	\\
+				2	&b	&b	&w	&w	&w	&g	\\
+				3	&c	&c	&a	&a	&a	&f	\\
+				4	&d	&d	&h	&h	&f	&w	\\
+				5	&e	&e	&g	&f	&g	&a	\\
+				6	&w	&f	&e	&e	&e	&e	\\
+				7	&g	&g	&d	&d	&d	&d	\\
+				8	&h	&h	&c	&c	&c	&c	\\
+				9	&f	&w	&b	&b	&b	&b	\\
+			\end{array}
+		$%
+	}
+	\centering
+	$
+		\begin{array}{lrrrrrrrrr}
+			&\multicolumn{9}{c}{\text{ranks}}\\
+		\cmidrule{2-10}
+			&1	&≤2	&≤3	&≤4	&≤5	&≤6	&≤7	&≤8	&≤9	\\
+		\midrule
+		w	&0	& 30	& 30	& 51	& 51	& 82	& 82	& 82	&101	\\
+		a	&50	& 50	& 80	& 80	& 101	& 101	& 101	&101	&101	\\
+		\end{array}
+	$
+\end{frame}
+
+\section{Our contribution}
+\subsection{Goal}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{itemize}
+		\item Better understanding of rules
+		\item Illustrate reasoning of ≠ rules
+		\item On examples
+		\item On the basis of axioms
+		\item Long-term goal: compare rules by letting them argue
+	\end{itemize}
+\end{frame}
+
+\subsection{Approach}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{itemize}
+		\item Express some axioms in a simple formal language
+		\item Compute automatically their applications on examples
+		\item Apply to the Borda rule
+	\end{itemize}
+\end{frame}
+
+\subsection{Formal language}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{itemize}
+		\item We use propositional logic
+		\item A restricted language for easier deductions
+		\item Contains $¬, ∨,∧, →$ but not $\forall, \exists$
+		\item We translate axioms into this language
+	\end{itemize}
+\end{frame}
+
+\subsection[Aim]{What we aim at}
+\begin{frame}
+	\frametitle{Example profile}
+	\begin{block}{Who should win?}
+		\begin{equation}
+			\prof =
+			\begin{array}{rrr}
+				a&a&c\\
+				b&b&b\\
+				c&c&a\\
+			\end{array}
+		\end{equation}
+	\end{block}
+	\begin{itemize}
+		\item Veto rule chooses $b$
+		\item Borda rule chooses $a$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\subsecname}
+	\vspace{-13pt}
+	\begin{equation}
+		\prof =
+		\begin{array}{>{\color{red}}r>{\color{darkgreen}}r>{\color{darkgreen}}r}
+			a&a&c\\
+			b&b&b\\
+			c&c&a\\
+		\end{array}
+	\end{equation}
+	\begin{tabularx}{\linewidth}{@{}>{\bfseries}lX>{\color{gray}[}r<{]}@{}}
+		System: & Take the \textcolor{red}{\textit{red subprofile}}. Here, \textcolor{red}{\textit{$a$ should win}}, right? & unanimity \\
+		User: & Obviously! \\
+		System: & Now consider the \textcolor{darkgreen}{\textit{green subprofile}}. For symmetry reasons, there should be a \emph{three-way tie}, right? & cancellation \\
+		User: & Sounds reasonable. \\
+		System: &  So, as there was a three-way tie for the green part, the red part should decide the overall winner, right? & reinforcement \\
+		User: & Yes. \\
+		System: & \multicolumn{2}{l}{To summarise, you agree that $a$ should win.}
+	\end{tabularx}
+\end{frame}
+
+\subsection{Provided}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{itemize}
+		\item Our system can automatically explain the outcome of Borda
+		\item Starting from any profile
+		\item Requires solving a system of equation to find right intermediate profiles
+		\item Does not use natural language (for the moment)
+	\end{itemize}
+\end{frame}
+
+\subsection{Conclusion}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{itemize}
+		\item No perfect voting rule
+		\item Strengths can be expressed using axioms
+		\item We use a specific language to express some of these axioms
+		\item We can then instanciate concrete arguments (example-based)
+		\item May render some arguments in the specialized literature accessible to non experts
+		\item Extensions may permit to \emph{debate} about voting rules
+		\item Provides a way to study appreciation of arguments
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\addtocounter{framenumber}{-1}
+	\begin{center}
+		\huge
+		\textit{Thank you for your attention!}
+	\end{center}
+\end{frame}
+
+\appendix
+\AtBeginSection{
+}
+
+\begin{frame}[allowframebreaks]
+	\frametitle{Bibliography}
+	\def\newblock{\hskip .11em plus .33em minus .07em}
+ 	\bibliography{zotero}
+\end{frame}
+
+\section{Analyzing rules}
+\subsection{Naïve attempt}
+\begin{frame}
+	\frametitle{\subsecname}
+	⇒ Examine outcome of a rule on every possible profile?
+	\begin{enumerate}
+		\item We may not see what the problem is on a given example
+		\item Too time consuming
+	\end{enumerate}
+	4 alternatives, 6 voters: at least $(4!)^6/4!/6!$ profiles $\eqsim \si{10000}$ {\tiny deducing obvious symetries for anonymity and neutrality}
+% 4 voters, 4 alts: nb profiles = (4!)^4 but divided by approx 4! for permutations of alts, and divided by (very approx) 4! for permutations of voters, thus only 24×24 = 576.
+\end{frame}
+
+\section{Axioms}
+\subsection{Anonymity}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{definition}[Anonymity]
+		The identity of the voters should not matter
+	\end{definition}
+	\begin{equation}
+		\prof_1 =
+		\begin{array}{rrr}
+			1&2&3\\
+			a&b&b\\
+			b&a&c\\
+			c&c&a\\
+		\end{array},
+		\prof_2 =
+		\begin{array}{ccc}
+			3&1&2\\
+			a&b&b\\
+			b&a&c\\
+			c&c&a\\
+		\end{array}
+	\end{equation}
+	Constraint? \pause Same winners.
+\end{frame}
+
+\subsection{Cyclic profiles}
+\begin{frame}
+	\frametitle{\subsecname}
+	Given $S$ a complete cycle in $\allalts$, define $\pcycl{S}$.
+	\begin{definition}[Cyclic profile]
+		$\pcycl{S}$ is the profile composed by all $\card{\allalts}$ possible linearizations of $S$ as preference orderings. 
+	\end{definition}
+	\begin{example}
+		\begin{equation}
+			\pcycl{\left<a, b, c, d\right>} =
+			\begin{array}{cccc}
+				a&b&c&d\\
+				b&c&d&a\\
+				c&d&a&b\\
+				d&a&b&c\\
+			\end{array}.
+		\end{equation}
+	\end{example}
+\end{frame}
+
+\subsection{Reinforcement}
+\begin{frame}
+	\frametitle{Reinforcement l-axiom}
+	Consider $\prof_1$, $\prof_2$,
+	\begin{itemize}
+		\item having winners $A_1$, $A_2$,
+		\item with $A_1 \cap A_2 ≠ \emptyset$;
+	\end{itemize}
+	then winners in $\prof_1 + \prof_2$ must be $A_1 \cap A_2$.
+	\begin{definition}[\laxiom{Reinf}]
+		For each $\prof_1, \prof_2, A_1, A_2 \subseteq \allalts, A_1 \cap A_2 ≠ \emptyset$:
+		\begin{equation}
+			(\lato[\prof_1][A_1] ∧ \lato[\prof_2][A_2]) → \lato[\prof_1 + \prof_2][A_1 \cap A_2].
+		\end{equation}
+	\end{definition}
+\end{frame}
+
+\section{Example using Borda}
+\begin{frame}
+	\frametitle{An example}
+	
+	Consider $\allalts=\set{a, b, c, d}$ and a profile $\prof$ defined as:
+	\begin{equation}
+		\prof =
+		\begin{array}{cc}
+			a	&	c\\
+			b	&	b\\
+			d	&	a\\
+			c	&	d
+		\end{array}.
+	\end{equation}
+	\pause
+	We want to justify that $f_B(\prof)=\Set{a, b}$.
+\end{frame}
+
+\begin{frame}
+	\frametitle{Sketch}
+	
+	\begin{itemize}
+		\item Consider any $\prof' = q_1 \pelem{a, b} + q_2 \pelem{a, b, c} + \sum_{S \in \mathcal{S}} q_S \pcycl{S}$, $q_1, q_2, q_S \in \N, \mathcal{S}$ some set of cycles.
+		\item In $\prof'$, $W=\set{a, b}$ must win.
+		\item Find $k \in \N$ such that $\overline{k \prof} + \prof'$ cancel.
+		\item Then $k \prof$ has winners $W$. (Skipping details.)
+		\item Then $\prof$ has winners $W$.
+	\end{itemize}
+	Our task: find $\prof'$ a combination of elementary and cyclic profiles such that $\overline{k \prof} + \prof'$ cancel.
+	
+	Good news: this is always possible.
+\end{frame}
+
+\begin{frame}
+	\frametitle{Application on the example}
+	
+	Define $\prof' = \pelem{a, b} + 2 \pelem{a, b, c} + \pcycl{\left<c, b, a, d\right>} + \pcycl{\left<b, d, c, a\right>}$.
+	\begin{enumerate}
+		\item $\lato[\pelem{a, b}][\set{a, b}]$ (\laxiom{elem})
+		\item $\lato[\pelem{a, b, c}][\set{a, b, c}]$ (\laxiom{elem})
+		\item $\lato[\pcycl{\left<c, b, a, d\right>}][\allalts]$ (\laxiom{cycl})
+		\item $\lato[\pcycl{\left<b, d, c, a\right>}][\allalts]$ (\laxiom{cycl})
+		\item $\lato[\prof'][\set{a, b}]$ (\laxiom{reinf}, 1, 2, 3, 4)
+		\item $\lato[4 \prof + \overline{4 \prof}][\allalts]$ (\laxiom{canc})
+		\item $\lato[4 \prof + \overline{4 \prof} + \prof'][\set{a, b}]$ (\laxiom{reinf}, 5, 6)
+		\item $\lato[\overline{4 \prof} + \prof'][\allalts]$ (\laxiom{canc})
+		\item $\lato[4 \prof][\set{a, b}]$ (\laxiom{reinf}, 7, 8)
+		\item $\lato[\prof][\set{a, b}]$ (\laxiom{reinf}, 9)
+	\end{enumerate}
+\end{frame}
+
+\section{License}
+\begin{frame}
+	\frametitle{License}
+	This presentation, and the associated \LaTeX{} code, are published under the \href{http://opensource.org/licenses/MIT}{MIT license}. Feel free to reuse (parts of) the presentation, under condition that you cite the author.
+	
+	Credits are to be given to \href{http://www.lamsade.dauphine.fr/~ocailloux/}{Olivier Cailloux}, Université Paris-Dauphine.
+\end{frame}
+\end{document}
+
+\section{Frame template}
+\subsection{}
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{itemize}
+		\item 
+	\end{itemize}
+\end{frame}
+
