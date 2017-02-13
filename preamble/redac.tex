@@ -7,6 +7,37 @@
 % \newfloat{program}{t}{lop}
 % \floatname{program}{PM}
 
+%definition, theorem, lemma, example environments, qed trickery are only needed in article mode (not Beamer)
+\nottoggle{LCpres}{
+%style is plain by default (italic text)
+	\newtheorem{definition}{Definition}
+	\newtheorem{theorem}{Theorem}
+%no italic: expected.
+%http://tex.stackexchange.com/questions/144653/italicizing-of-amsthm-package
+	\newtheorem{lemma}{Lemma}
+%\crefname{axiom}{axiom}{axioms}%might be needed for workaround bug in cref when defining new theorems?
+
+%\ifdefined\theorem\else
+%\newtheorem{theorem}{\iflanguage{english}{Theorem}{Théorème}}
+%\fi
+
+\theoremstyle{remark}
+	\newtheorem{examplex}{Example}
+	\newtheorem{remarkx}{Remark}
+
+%trickery allowing use of \qedhere and the like.
+\newenvironment{example}{
+	\pushQED{\qed}\renewcommand{\qedsymbol}{$\triangle$}\examplex
+}{
+	\popQED\endexamplex
+}
+\newenvironment{remark}{
+	\pushQED{\qed}\renewcommand{\qedsymbol}{$\triangle$}\remarkx
+}{
+	\popQED\endremarkx
+}
+}
+
 %which line breaks are chosen: accept worse lines, therefore reducing risk of overfull lines. Default = 200
 \tolerance=2000
 %accept overfull hbox up to...

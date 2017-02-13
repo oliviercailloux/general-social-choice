@@ -1,6 +1,9 @@
 %const
 \newcommand{\tikzboxit}{\path node[draw, overlay, inner sep=0.6mm, fit=(boxed), rectangle] {};}%
 
+\newlength{\GraphsNodeSep}
+\setlength{\GraphsNodeSep}{7mm}
+
 % MCDA Drawing Sorting
 \newlength{\MCDSCatHeight}
 \setlength{\MCDSCatHeight}{6mm}
@@ -19,8 +22,6 @@
 \newcounter{MCDSNbCats}
 \newlength{\MCDSArrowDownOffset}
 \setlength{\MCDSArrowDownOffset}{0mm}
-\newlength{\GraphsNodeSep}
-\setlength{\GraphsNodeSep}{7mm}
 
 \tikzset{/Graphs/dot/.style={
 	shape=circle, fill=black, inner sep=0, minimum size=1mm
@@ -49,17 +50,11 @@
 \tikzset{isolated rank-vector/.style={
 	draw, matrix of math nodes, column sep=3mm, inner sep=0, matrix anchor=base, nodes={anchor=base, inner sep=.33em}, ampersand replacement=\&
 }}
-\newcommand{\isolatedrankvector}[2]{%
-		\begin{tikzpicture}[baseline]
-			\path node[isolated rank-vector] {#1\&#2\\};
-		\end{tikzpicture}%
-}
-\newcommand{\isolatedrankvectorinarray}[2]{%
-		\begin{tikzpicture}[baseline]
-			\path node[isolated rank-vector] {#1\&#2\\};
-			\path (current bounding box.south west) ++(0, -0.33em);
-		\end{tikzpicture}%
-}
+
+% GUI
+\tikzset{/GUI/button/.style={
+	rectangle, very thick, rounded corners, draw=black, fill=black!40%, top color=black!70, bottom color=white
+}}
 
 % Beliefs
 \tikzset{/Beliefs/D/S/attacker/.style={
