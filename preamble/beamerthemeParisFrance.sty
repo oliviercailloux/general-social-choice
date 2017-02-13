@@ -38,7 +38,7 @@
 }
 
 % bug corrected, https://bitbucket.org/rivanvx/beamer/issue/195/incorrect-handling-of-empty-shortinstitute
-\defbeamertemplate{footline}{authortitle}{%
+\defbeamertemplate*{footline}{authortitle}{%
 	\leavevmode%
 	\hbox{%
 		\begin{beamercolorbox}[wd=.45\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
@@ -56,7 +56,15 @@
 	}
 }
 
-\defbeamertemplate*{footline}{titlesubtitle}{%
+\defbeamertemplate{footline}{onlypage}{%
+	\leavevmode%
+	\hfill
+	\begin{beamercolorbox}[wd=.1\paperwidth,ht=2.25ex,dp=1ex,right]{page number in head/foot}%
+		\insertframenumber{} / \inserttotalframenumber\hspace*{2ex}%
+	\end{beamercolorbox}%
+}
+
+\defbeamertemplate{footline}{titlesubtitle}{%
 	\leavevmode%
 	\hbox{%
 		\begin{beamercolorbox}[wd=.45\paperwidth,ht=2.25ex,dp=1ex,center]{first part in head/foot}%
