@@ -4,7 +4,7 @@
 \WarningFilter{nag}{1 complaints in total}
 \WarningFilter{ifpdf}{Someone has redefined \pdfoutput}
 \WarningFilter{fmtcount}{\ordinal already defined use \FCordinal instead}
-\documentclass[french,english]{beamer}
+\documentclass[french, english]{beamer}
 \input{preamble/packages}
 \input{preamble/math_basics}
 \input{preamble/math_mine}
@@ -29,6 +29,9 @@
 		};
 		\path (current page.south east) node[anchor=south east, inner sep=0] {
 			\includegraphics[height=1cm]{PSL.png}
+		};
+		\path (current page.south) ++ (0, 3em) node[anchor=south, inner sep=0] {
+			\scriptsize\url{https://github.com/oliviercailloux/general-social-choice}
 		};
 	}
 	\titlepage
@@ -75,6 +78,8 @@
 	\end{itemize}
 	\begin{equation}
 		\begin{array}{rrr}
+			1	&2	&3\\
+			\midrule
 			a	&b	&c\\
 			b	&c	&a\\
 			c	&a	&b\\
@@ -475,7 +480,7 @@ Given a profile $\prof$:
 	\frametitle{\subsecname}
 	
 	Fix an arbitrary linear order $k$ on $\allalts$. Given $A \subseteq \allalts$, define $\pelem{A}$.
-	\begin{minipage}{5.7cm}
+	\begin{minipage}{5.8cm}
 		\begin{definition}[Elementary profile]
 			\begin{tikzpicture}
 				\path node[profile matrix, row 2/.style={nodes={draw, rectangle, minimum width=1.5em, minimum height=9ex}}, row 3/.style={nodes={draw, rectangle, minimum width=1.5em, minimum height=6ex}}] (profile) {
@@ -496,8 +501,8 @@ Given a profile $\prof$:
 				\path (profile.south) ++(0, -5mm) node {$\pelem{A}$};
 			\end{tikzpicture}
 		\end{definition}
-	\end{minipage}\hspace{2em}%
-	\begin{minipage}{\columnwidth - 5.7cm - 2em}
+	\end{minipage}\hspace{7mm}%
+	\begin{minipage}{\columnwidth - 5.8cm - 7mm}
 		\begin{example}
 			\begin{tikzpicture}
 				\path node[profile matrix] (profile) {
@@ -766,9 +771,9 @@ Given a profile $\prof$:
 \AtBeginSection{
 }
 
-\begin{frame}[allowframebreaks]
-	\frametitle{Bibliography}
-	\def\newblock{\hskip .11em plus .33em minus .07em}
+\clearpage\pdfbookmark[2]{\refname}{\refname}
+\begin{frame}
+	\frametitle{\refname}
  	\bibliography{zotero}
 \end{frame}
 
@@ -899,13 +904,14 @@ Given a profile $\prof$:
 	\end{enumerate}
 \end{frame}
 
-\section{License}
-\begin{frame}
+\clearpage\pdfbookmark{License}{License}
+\begin{frame}[plain]
 	\frametitle{License}
 	This presentation, and the associated \LaTeX{} code, are published under the \href{http://opensource.org/licenses/MIT}{MIT license}. Feel free to reuse (parts of) the presentation, under condition that you cite the author.
 	
 	Credits are to be given to \href{http://www.lamsade.dauphine.fr/~ocailloux/}{Olivier Cailloux}, Université Paris-Dauphine.
 \end{frame}
+\addtocounter{framenumber}{-1}
 \end{document}
 
 \section{Frame template}
